@@ -45,4 +45,4 @@ done
 
 fslmerge -t sub-*_cope1_diff.nii.gz merged_cope1_diff
 fslmaths merged_cope1_diff -Tmin -bin mask
-randomise -i merged_cope1_diff -o rand_out_cope1 -d design.mat -t design.con -T -c 3.1
+randomise -i merged_cope1_diff -o rand_out_cope1 -d design.mat -t design.con -m mask -T -c 3.1
