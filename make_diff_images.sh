@@ -20,7 +20,7 @@ for subj in SB018_fu2 SB019_fu2 SB034_fu2 SB036_fu2 SB064_fu2 SB067_fu2 SB088_fu
 	avoid=$datadir/L1_RewAv_model02_CF_2.feat/stats/cope1.nii.gz #first contrast
 
 	# joint mask
-	fslmaths $datadir/L1_RewAv_model02_CF_1.feat/mask.nii.gz -mas $datadir/L1_RewAv_model02_CF_1.feat/mask.nii.gz tmpmask
+	fslmaths $datadir/L1_RewAv_model02_CF_1.feat/mask.nii.gz -mas $datadir/L1_RewAv_model02_CF_2.feat/mask.nii.gz tmpmask
 
 	# create diference image and delete tmpmask
 	fslmaths $approach -sub $avoid -mas tmpmask sub-${subj}_cope1_diff
@@ -36,7 +36,7 @@ for subj in SB002_fu2 SB103_fu2 SB131_fu2 SB135_fu2 SB152_fu2 SB164_fu2 SB169_fu
 	avoid=$datadir/L1_RewAv_model02_CF_1.feat/stats/cope1.nii.gz #first contrast
 
 	# joint mask
-	fslmaths $datadir/L1_RewAv_model02_CF_1.feat/mask.nii.gz -mas $datadir/L1_RewAv_model02_CF_1.feat/mask.nii.gz tmpmask
+	fslmaths $datadir/L1_RewAv_model02_CF_1.feat/mask.nii.gz -mas $datadir/L1_RewAv_model02_CF_2.feat/mask.nii.gz tmpmask
 
 	# create diference image
 	fslmaths $approach -sub $avoid -mas tmpmask sub-${subj}_cope1_diff
