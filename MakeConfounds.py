@@ -35,7 +35,7 @@ for f in cons:
     task=re.search('_task-(.*)_',f).group(1)
     derivitive_path=re.search('(.*)fmriprep/sub',f).group(1)
     
-    output=derivitive_path+"Counfounds/%s/%s_task-%s_run-%s_desc-fslConfounds.tsv" %(sub,sub,task,run)
+    output=derivitive_path+"/fsl/counfounds/%s/%s_task-%s_run-%s_desc-fslConfounds.tsv" %(sub,sub,task,run)
     print("%s"%(output))
     
     #read in the confounds, aroma mixing, and aroma confound indexes
@@ -44,10 +44,10 @@ for f in cons:
     other=['csf','white_matter']
     cosine = [col for col in con_regs if col.startswith('cosine')]
     NSS = [col for col in con_regs if col.startswith('non_steady_state')]
-    motion_out=[col for col in con_regs if col.startswith('motion_outlier')]
-    #aroma_motion=[col for col in df1 if col.startswith('aroma')]
+    #motion_out=[col for col in con_regs if col.startswith('motion_outlier')]
+    aroma_motion=[col for col in df1 if col.startswith('aroma')]
     
-    filter_col=np.concatenate([cosine,NSS,motion_out,other])#here we combine all NSS AROMA motion & the rest 
+    filter_col=np.concatenate([cosine,NSS,aroma_motion,other])#here we combine all NSS AROMA motion & the rest 
     
     #This Dataframe will be the full filter matrix
     df_all=con_regs[filter_col]   
