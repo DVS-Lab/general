@@ -53,5 +53,5 @@ for f in cons:
     df_all=con_regs[filter_col]   
     
     
-    #df_all.to_csv(output,index=False,sep='\t',header=False)
+    df_all.to_csv(output,index=False,sep='\t',header=False)
 
