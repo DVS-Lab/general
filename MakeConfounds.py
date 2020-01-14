@@ -35,7 +35,7 @@ for f in cons:
     task=re.search('_task-(.*)_',f).group(1)
     derivitive_path=re.search('(.*)fmriprep/sub',f).group(1)
     
-    output=derivitive_path+"/fsl/counfounds/%s/%s_task-%s_run-%s_desc-fslConfounds.tsv" %(sub,sub,task,run)
+    output=derivitive_path+"fsl/counfounds/%s/%s_task-%s_run-%s_desc-fslConfounds.tsv" %(sub,sub,task,run)
     print("%s"%(output))
     
     #read in the confounds, aroma mixing, and aroma confound indexes
