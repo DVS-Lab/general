@@ -36,12 +36,13 @@ for root, dirs, files in os.walk(fmriprep_path):
 
 for f in cons:
     sub=re.search('/func/(.*)_task', f).group(1)
-    run=re.search('_run-(.*)_', f).group(1)
-    task=re.search('_task-(.*)_',f).group(1)
+    run=re.search('_run-(.*)_desc', f).group(1)
+    task=re.search('_task-(.*)_run',f).group(1)
     derivitive_path=re.search('(.*)fmriprep/sub',f).group(1)
 
-    output=derivitive_path+"fsl/confounds/%s_task-%s_run-%s_desc-fslConfounds.tsv" %(sub,task,run)
-    print("%s"%(output))
+
+    outfile="%s_task-%s_run-%s_desc-fslConfounds.tsv"%(sub,task,run)
+
 
     #read in the confounds, aroma mixing, and aroma confound indexes
     con_regs=pd.read_csv(f,sep='\t')
@@ -57,8 +58,10 @@ for f in cons:
     #This Dataframe will be the full filter matrix
     df_all=con_regs[filter_col]
     outdir=derivitive_path+"fsl/counfounds/%s/" %(sub)
+
     if not os.path.exists(outdir):
     	os.makedirs(outdir)
-
+    output=outdir+outfile
+    print(sub,run,task)
 
     df_all.to_csv(output,index=False,sep='\t',header=False)
