@@ -45,7 +45,7 @@ for f in cons:
     cosine = [col for col in con_regs if col.startswith('cosine')]
     NSS = [col for col in con_regs if col.startswith('non_steady_state')]
     #motion_out=[col for col in con_regs if col.startswith('motion_outlier')]
-    aroma_motion=[col for col in df1 if col.startswith('aroma')]
+    aroma_motion=[col for col in con_regs if col.startswith('aroma')]
     
     filter_col=np.concatenate([cosine,NSS,aroma_motion,other])#here we combine all NSS AROMA motion & the rest 
     
