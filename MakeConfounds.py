@@ -4,6 +4,11 @@
 # E.G. use 
 #$ python MakeConfounds.py --fmriprepDir="/data/projects/Tensor_game/Data/Raw/NARPS/derivatives/fmriprep"
 
+# TO DO:
+# 1. write to subject folders, create if it doesn't exist
+# 2. simplify input argument to project name. all paths should be standardized within a project folder
+# 3. check for existence of output before overwiting older output. helps with version control on datalad.
+# 4. give option to overwrite existing output
 
 
 import numpy as np
@@ -35,7 +40,7 @@ for f in cons:
     task=re.search('_task-(.*)_',f).group(1)
     derivitive_path=re.search('(.*)fmriprep/sub',f).group(1)
     
-    output=derivitive_path+"/fsl/counfounds/%s/%s_task-%s_run-%s_desc-fslConfounds.tsv" %(sub,sub,task,run)
+    output=derivitive_path+"fsl/confounds/%s_task-%s_run-%s_desc-fslConfounds.tsv" %(sub,task,run)
     print("%s"%(output))
     
     #read in the confounds, aroma mixing, and aroma confound indexes
