@@ -51,7 +51,10 @@ for f in cons:
     
     #This Dataframe will be the full filter matrix
     df_all=con_regs[filter_col]   
-    
+    outdir=derivitive_path+"fsl/counfounds/%s/" %(sub)
+    if not os.path.exists(outdir):
+    	os.makedirs(outdir)
+
     
     df_all.to_csv(output,index=False,sep='\t',header=False)
 
