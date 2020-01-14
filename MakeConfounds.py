@@ -40,7 +40,11 @@ for f in cons:
     task=re.search('_task-(.*)_',f).group(1)
     derivitive_path=re.search('(.*)fmriprep/sub',f).group(1)
     
+<<<<<<< HEAD
     output=derivitive_path+"fsl/confounds/%s_task-%s_run-%s_desc-fslConfounds.tsv" %(sub,task,run)
+=======
+    output=derivitive_path+"fsl/counfounds/%s/%s_task-%s_run-%s_desc-fslConfounds.tsv" %(sub,sub,task,run)
+>>>>>>> 5cc6de6bc9ba1cb29c209d345c7e664c31a67192
     print("%s"%(output))
     
     #read in the confounds, aroma mixing, and aroma confound indexes
@@ -56,7 +60,10 @@ for f in cons:
     
     #This Dataframe will be the full filter matrix
     df_all=con_regs[filter_col]   
-    
+    outdir=derivitive_path+"fsl/counfounds/%s/" %(sub)
+    if not os.path.exists(outdir):
+    	os.makedirs(outdir)
+
     
     df_all.to_csv(output,index=False,sep='\t',header=False)
 
