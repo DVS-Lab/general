@@ -57,7 +57,7 @@ for f in cons:
 
     #This Dataframe will be the full filter matrix
     df_all=con_regs[filter_col]
-    outdir=derivitive_path+"fsl/counfounds/%s/" %(sub)
+    outdir=derivitive_path+"fsl/confounds/%s/" %(sub)
 
     if not os.path.exists(outdir):
     	os.makedirs(outdir)
