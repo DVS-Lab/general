@@ -3,39 +3,62 @@
 # E.G. use
 #$ python OutlierID.py --mriqcDir="/data/projects/Tensor_game/NARPS/derivatives/MRIQC"
 
-import numpy as np
+import seaborn as sb # I import seaborn as sb a lot of other people use sns but I find that harder to remember
+import numpy as np 
+import json
 import pandas as pd
-import argparse
 import os
-import re
+import itertools
 
-parser = argparse.ArgumentParser(description='Give me the full path to your mriqc output, Make sure the path is in quotes and ')
-group = parser.add_mutually_exclusive_group(required=True)
 
-group.add_argument('--mriqcDir',default=None, type=str,help="This is the full path to your mriqc dir")
+parser = argparse.ArgumentParser(description='This script creates 3 files from MRIQC data a list of good subjects, bad subjects, and bad runs. isomg  dvars_nstd,tsnr,fd_mean,gsr_x,gsr_y, & aqi ')
+
+parser.add_argument('--mriqcDir',default=None, type=str,help="This is the full path to your mriqc dir",required=True)
+
 args = parser.parse_args()
 
-path_Mriqc = args.mriqcDir
+
+mriqc_dir = args.mriqcDir
 path_derivative=path_Mriqc[:-5]
 
-print("finding group files files located in %s"%(path_Mriqc))
-
-#MRIQC creates a group level tsv file that I think we can easily read in and play with using pandas
-group_files=[f for f in os.listdir(path_Mriqc) if "group" in f]
-print("These are all of the group MRIQC Files")
-print(group_files)
-print("  ")
-keys=['bids_name','dvars_nstd','tsnr','fd_mean','gsr_x','gsr_y','aqi'] # the IQM's we might care about
 
 
-#We read in the MRIWC group bold data and filter in only the IQM's we want
-mr_QC=pd.read_csv(path_Mriqc+'/group_bold.tsv',sep='\t')
-mr_QC=mr_QC[keys]
+# In[3]:
+
+
+j_files=[os.path.join(root, f) for root,dirs,files in os.walk(mriqc_dir) for f in files if f.endswith('bold.json')] #j_files for json files
+
+
+# In[4]:
+
+
+# Here we make an array that we can import into pandas for easier manipulation
+# We open each json file as a python "dictionary" in the j_files array and extract the data we want
+keys=['dvars_nstd','tsnr','fd_mean','gsr_x','gsr_y','aqi'] # the IQM's we might care about
+sr=['Sub','task','run']
+# Open an empty array and fill it. Do this it is a good idea
+row=[]
+import re # re will let us parse text in a nice way
+for i in range(len(j_files)):
+    sub=re.search('/mriqc/(.*)/func', j_files[i]).group(1) # this will parse the text for a string that looks like sub-###
+    task=re.search('task-(.*)_run',j_files[i]).group(1)
+    run=re.search('_run-(.*)_bold.json', j_files[i]).group(1) # this is parsed just as # so we have to put in the run text ourselves if we want later
+    with open(j_files[i]) as f: #we load the j_son file and extract the dictionary ingo
+        data = json.load(f)
+    now=[sub,task,run]+[data[x]for x in keys] #the currently created row in the loop
+    row.append(now) #through that row on the end
+    
+df=pd.DataFrame(row,columns=sr+keys) # imaybe later try to do multi-indexing later with sub and run as the index?
+
+
+# In[5]:
+
+
 
 #Making the outlier fences
 #find the 1 and 3rd quartile
-Q1=mr_QC.quantile(0.25)
-Q3=mr_QC.quantile(0.75)
+Q1=df[keys].quantile(0.25)
+Q3=df[keys].quantile(0.75)
 #find the interquartile range
 IQR = Q3 - Q1
 #defining fences as 1.5*IQR further than the 1st and 3rd quartile from the mean
@@ -46,37 +69,25 @@ upper.tsnr=upper.tsnr*100 # so we don't exclude runs with "too good" signal-nois
 print("These are the upper and lower bounds for our metrics")
 print(lower.to_frame(name='lower').join(upper.to_frame(name='upper')))
 
-#Here we make comparisons
-dfLower=mr_QC<lower #We get a dataframe of Booleans where True is below out lower bound
-dfUpper=mr_QC>upper # We get a dataframe of Booleans where True is above our upper bound
-dfUpper.drop(labels=['bids_name'],inplace=True,axis=1) # we drop bidsname because for some reason it's True
+outList=(df[keys]<upper)&(df[keys]>lower)#Here we make comparisons
+df['outlier_run']=~outList.all(axis='columns')
 
-# Here we get a list of values where it is below or above any of our lower or upper bounds respectively
-lowerList=dfLower.any(axis="columns")
-upperList=dfUpper.any(axis="columns")
-mr_QC['outlier']=np.logical_or(lowerList,upperList)
-print(mr_QC[mr_QC['outlier']==True].head())
-
-mr_QC.to_csv(path_derivative+"OutlierRuns.tsv",sep="\t")
-            
-import re
-outlier_files=mr_QC[mr_QC["outlier"]==True].bids_name
-all_subs=[re.search("(.*)_task",f).group(1) for f in outlier_files]
-bad_subs=[i for i in np.unique(all_subs) if all_subs.count(i)>2]
-
-all_subs=[re.search("(.*)_task",f).group(1) for f in mr_QC.bids_name]
-good_subs=pd.DataFrame([sub for sub in np.unique(all_subs) if sub not in bad_subs],columns=['sub_number'])
-
-bad_subs=pd.DataFrame(bad_subs)
-bad_subs.to_csv(path_derivative+"/BAD_subs.tsv",sep="\t",index=False,header=False)
-good_subs.to_csv(path_derivative+"/GOOD_subs.tsv",sep="\t",index=False,header=False)
+df=df.sort_values(by=sr)
+print('These are the identifies outlier Runs')
+print(df[df['outlier_run']==True])
+df.to_csv(path_derivative+"OutlierRuns.tsv",sep="\t",index=False)
 
 
-#Display Bad subjects
-print("The following list of subjects have 3 or more Bad Runs \n")
-print(bad_subs.T)
-print type(good_subs)
+# In[6]:
 
-print ("to view details see the BAD_subs.tsv, GOOD_subs.tsv, and OutlierRuns.tsv saved in your derivatives folder")
 
+good=df[df.outlier_run==False]
+row=[]
+for sub,task in itertools.product(good['Sub'].unique(),good['task'].unique()):
+    row.append([sub, task, good[(good['Sub']==sub) & (good['task']==task)].shape[0]])
+good_task=pd.DataFrame(row,columns=['Sub','Task','Good_Runs'])
+good_task.to_csv(path_derivative+"GoodRunNumber.tsv",sep="\t",index=False)
+
+        
+    
 
