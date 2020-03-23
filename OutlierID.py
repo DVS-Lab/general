@@ -3,13 +3,13 @@
 # E.G. use
 #$ python OutlierID.py --mriqcDir="/data/projects/Tensor_game/NARPS/derivatives/MRIQC"
 
-import seaborn as sb # I import seaborn as sb a lot of other people use sns but I find that harder to remember
+#import seaborn as sb # I import seaborn as sb a lot of other people use sns but I find that harder to remember
 import numpy as np 
 import json
 import pandas as pd
 import os
 import itertools
-
+import argparse
 
 parser = argparse.ArgumentParser(description='This script creates 3 files from MRIQC data a list of good subjects, bad subjects, and bad runs. isomg  dvars_nstd,tsnr,fd_mean,gsr_x,gsr_y, & aqi ')
 
@@ -17,19 +17,10 @@ parser.add_argument('--mriqcDir',default=None, type=str,help="This is the full p
 
 args = parser.parse_args()
 
-
 mriqc_dir = args.mriqcDir
-path_derivative=path_Mriqc[:-5]
-
-
-
-# In[3]:
-
+path_derivative=mriqc_dir[:-5]
 
 j_files=[os.path.join(root, f) for root,dirs,files in os.walk(mriqc_dir) for f in files if f.endswith('bold.json')] #j_files for json files
-
-
-# In[4]:
 
 
 # Here we make an array that we can import into pandas for easier manipulation
