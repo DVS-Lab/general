@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser(description='This script creates 3 files from M
 
 parser.add_argument('--mriqcDir',default=None, type=str,help="This is the full path to your mriqc dir",required=True)
 parser.add_argument('--keys',default=dvars_nstd tsnr fd_mean gsr_x gsr_y aqi,type=string,nargs='+')
+parser.add_argument('--excludesubs',default=none,type=string,nargs='+')
 
 args = parser.parse_args()
 
@@ -22,6 +23,7 @@ mriqc_dir = args.mriqcDir
 path_derivative=mriqc_dir[:-5]
 
 keys=args.keys # the IQM's we might care about
+exclude=args.excludesubs
 
 j_files=[os.path.join(root, f) for root,dirs,files in os.walk(mriqc_dir) for f in files if f.endswith('bold.json')] #j_files for json files
 
@@ -40,7 +42,8 @@ for i in range(len(j_files)):
     with open(j_files[i]) as f: #we load the j_son file and extract the dictionary ingo
         data = json.load(f)
     now=[sub,task,run]+[data[x]for x in keys] #the currently created row in the loop
-    row.append(now) #through that row on the end
+    if sub not in exclude:
+        row.append(now) #through that row on the end
     
 df=pd.DataFrame(row,columns=sr+keys) # imaybe later try to do multi-indexing later with sub and run as the index?
 
