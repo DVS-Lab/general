@@ -14,8 +14,8 @@ import argparse
 parser = argparse.ArgumentParser(description='This script creates 3 files from MRIQC data a list of good subjects, bad subjects, and bad runs. isomg  dvars_nstd,tsnr,fd_mean,gsr_x,gsr_y, & aqi ')
 
 parser.add_argument('--mriqcDir',default=None, type=str,help="This is the full path to your mriqc dir",required=True)
-parser.add_argument('--keys',default=dvars_nstd tsnr fd_mean gsr_x gsr_y aqi,type=string,nargs='+')
-parser.add_argument('--excludesubs',default=none,type=string,nargs='+')
+parser.add_argument('--keys',default=['dvars_nstd', 'tsnr', 'fd_mean', 'gsr_x', 'gsr_y', 'aqi'],type=list)
+parser.add_argument('--excludesubs',default=[],type=list)
 
 args = parser.parse_args()
 
@@ -23,6 +23,8 @@ mriqc_dir = args.mriqcDir
 path_derivative=mriqc_dir[:-5]
 
 keys=args.keys # the IQM's we might care about
+if not keys:
+	print("something went wrong with the iqm you provided")
 exclude=args.excludesubs
 
 j_files=[os.path.join(root, f) for root,dirs,files in os.walk(mriqc_dir) for f in files if f.endswith('bold.json')] #j_files for json files
