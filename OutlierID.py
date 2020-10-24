@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # E.G. use
-#$ python OutlierID.py --mriqcDir="/data/projects/Tensor_game/NARPS/derivatives/MRIQC"
+#$ python OutlierID.py --mriqcDir="/data/projects/Tensor_game/NARPS/derivatives/MRIQC" --keys tsnr fdmean
 
 #import seaborn as sb # I import seaborn as sb a lot of other people use sns but I find that harder to remember
 import numpy as np 
@@ -14,18 +14,25 @@ import argparse
 parser = argparse.ArgumentParser(description='This script creates 3 files from MRIQC data a list of good subjects, bad subjects, and bad runs. isomg  dvars_nstd,tsnr,fd_mean,gsr_x,gsr_y, & aqi ')
 
 parser.add_argument('--mriqcDir',default=None, type=str,help="This is the full path to your mriqc dir",required=True)
+parser.add_argument('--keys',default=['dvars_nstd', 'tsnr', 'fd_mean', 'gsr_x', 'gsr_y', 'aqi'],type=list)
+parser.add_argument('--excludesubs',default=[],type=list)
 
 args = parser.parse_args()
 
 mriqc_dir = args.mriqcDir
 path_derivative=mriqc_dir[:-5]
 
+keys=args.keys # the IQM's we might care about
+if not keys:
+	print("something went wrong with the iqm you provided")
+exclude=args.excludesubs
+
 j_files=[os.path.join(root, f) for root,dirs,files in os.walk(mriqc_dir) for f in files if f.endswith('bold.json')] #j_files for json files
 
 
 # Here we make an array that we can import into pandas for easier manipulation
 # We open each json file as a python "dictionary" in the j_files array and extract the data we want
-keys=['dvars_nstd','tsnr','fd_mean','gsr_x','gsr_y','aqi'] # the IQM's we might care about
+
 sr=['Sub','task','run']
 # Open an empty array and fill it. Do this it is a good idea
 row=[]
@@ -37,7 +44,8 @@ for i in range(len(j_files)):
     with open(j_files[i]) as f: #we load the j_son file and extract the dictionary ingo
         data = json.load(f)
     now=[sub,task,run]+[data[x]for x in keys] #the currently created row in the loop
-    row.append(now) #through that row on the end
+    if sub not in exclude:
+        row.append(now) #through that row on the end
     
 df=pd.DataFrame(row,columns=sr+keys) # imaybe later try to do multi-indexing later with sub and run as the index?
 
