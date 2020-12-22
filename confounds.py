@@ -49,7 +49,7 @@ def simple_filter(f): #reads in file, outputs filtered df
 
 proj_dir = sys.argv[1]
 file_list = glob.glob(proj_dir + '/**/derivatives/fmriprep/sub*/func/*confounds*.tsv', recursive=True)
-out_file = 'data/fsl/confounds/'
+out_file = 'data/derivatives/fsl/confounds/'
 
 for cnf_file in file_list:
 
@@ -68,4 +68,4 @@ for cnf_file in file_list:
     if not os.path.exists(out_path):
         os.makedirs(out_path)
     
-    df.to_csv('data/derivatives/fsl/confounds/' + file_name, index=False,sep='\t',header=False)
+    df.to_csv(out_path, index=False,sep='\t',header=False)
