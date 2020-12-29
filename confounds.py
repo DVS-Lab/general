@@ -4,11 +4,6 @@ usage: python3 confounds.py <path/to/project/directory>
 
 Caleb Haynes Winter 2020 - built off Jeff Denison's MakeConfounds.py script
 
-'''
-
-
-'''
-
 Objective:
 
 Read in confound regressor tsvs in fmriprep output. 
