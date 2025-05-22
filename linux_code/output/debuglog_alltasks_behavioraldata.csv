@@ -1,0 +1,11 @@
+sub_id,task,n_rows,expected
+10160,sharedreward_run1,81,54
+10478,sharedreward_run1,109,54
+10657,trust_run0,85,42
+10668,sharedreward_run1,109,54
+10777,trust_run0,85,42
+10858,sharedreward_run1,109,54
+10887,sharedreward_run1,109,54
+10926,sharedreward_run1,109,54
+11058,trust_run0,85,42
+11532,sharedreward_run1,109,54
